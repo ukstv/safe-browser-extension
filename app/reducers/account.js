@@ -39,6 +39,7 @@ function account (state = initalState, action) {
       }
 
     case UNLOCK_ACCOUNT:
+      console.log('ON UNLOCK ACCOUNT', action)
       return {
         ...state,
         lockedState: false,

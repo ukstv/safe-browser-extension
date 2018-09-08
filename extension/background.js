@@ -1,6 +1,8 @@
 import { createStore } from 'redux'
 import { wrapStore } from 'react-chrome-redux'
 import rootReducer from 'reducers'
+import { Buffer } from 'buffer'
+import * as sigUtil from 'eth-sig-util'
 
 import EthUtil from 'ethereumjs-util'
 import { loadStorage, saveStorage } from './utils/storage'
@@ -12,17 +14,19 @@ import {
   removeAllTransactions
 } from 'actions/transactions'
 import {
-  MSG_SHOW_POPUP,
-  MSG_UPDATE_CURRENT_SAFE,
-  MSG_ALLOW_INJECTION,
-  MSG_RESP_ALLOW_INJECTION,
-  MSG_LOCK_ACCOUNT_TIMER,
-  MSG_LOCK_ACCOUNT,
-  MSG_CONFIGURE_ACCOUNT_LOCKING,
-  MSG_RESOLVED_TRANSACTION,
-  MSG_PENDING_SENDTRANSACTION,
-  MSG_SILENT_SIGN
+    MSG_SHOW_POPUP,
+    MSG_UPDATE_CURRENT_SAFE,
+    MSG_ALLOW_INJECTION,
+    MSG_RESP_ALLOW_INJECTION,
+    MSG_LOCK_ACCOUNT_TIMER,
+    MSG_LOCK_ACCOUNT,
+    MSG_CONFIGURE_ACCOUNT_LOCKING,
+    MSG_RESOLVED_TRANSACTION,
+    MSG_PENDING_SENDTRANSACTION,
+    MSG_SILENT_SIGN, MSG_SILENT_SIGN_DONE
 } from './utils/messages'
+import {createAccountFromMnemonic} from "../app/routes/extension/DownloadApps/components/PairingProcess/containers/pairEthAccount";
+import BigNumber from "bignumber.js";
 
 const persistedState = loadStorage()
 
@@ -63,7 +67,7 @@ chrome.runtime.onMessage.addListener(
         break
 
       case MSG_SILENT_SIGN:
-        silentlySign(request.detail.address, request.detail.data);
+        silentlySign(request.detail.address, request.detail.data, sendResponse);
         break;
 
       case MSG_SHOW_POPUP:
@@ -167,8 +171,29 @@ const showSendTransactionPopup = (transaction, dappWindowId, dappTabId) => {
   showPopup(transaction, dappWindowId, dappTabId)
 }
 
-const silentlySign = (address, data) => {
-  console.log('DO SILENTLY SIGN', address, data)
+const silentlySign = (address, data, sendResponse) => {
+  let state = store.getState()
+  if (state.account.secondFA.unlockedMnemonic) {
+    let wallet = createAccountFromMnemonic(state.account.secondFA.unlockedMnemonic)
+    let privateKey = wallet.getPrivateKey()
+
+    let message = Buffer.from(data.replace(/0x/, ''), 'hex')
+    let prefix = Buffer.from('\x19Ethereum Signed Message:\n')
+    let messageLength = Buffer.from(message.length.toString())
+    let signed = Buffer.concat([prefix, messageLength, message])
+    let sha3edSigned = EthUtil.sha3(signed)
+    let msgSig = EthUtil.ecsign(sha3edSigned, privateKey)
+    let rawMsgSig = EthUtil.bufferToHex(sigUtil.concatSig(msgSig.v, msgSig.r, msgSig.s))
+
+      console.log('silentlySign', address, data, rawMsgSig)
+      console.log(sendResponse)
+    sendResponse({
+        msg: MSG_SILENT_SIGN_DONE,
+        signature: rawMsgSig
+    })
+  } else {
+    throw Error('DO UNLOCK THE WALLET')
+  }
 }
 
 let lockingTimer = null

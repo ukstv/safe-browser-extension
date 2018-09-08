@@ -6,7 +6,7 @@ import {
     EV_SCRIPT_READY,
     EV_UPDATE_WEB3,
     MSG_RESOLVED_TRANSACTION,
-    EV_RESOLVED_TRANSACTION, EV_SILENT_SIGN, MSG_SILENT_SIGN
+    EV_RESOLVED_TRANSACTION, EV_SILENT_SIGN, MSG_SILENT_SIGN, EV_SILENT_SIGN_DONE
 } from './utils/messages'
 
 // Checks if the page is whitelisted to inject the web3 provider
@@ -82,10 +82,16 @@ document.addEventListener(EV_SHOW_POPUP, function (data) {
 })
 
 document.addEventListener(EV_SILENT_SIGN, function (data) {
-  console.log('listener EV_SILENT_SIGN', data)
     chrome.runtime.sendMessage({
         msg: MSG_SILENT_SIGN,
         detail: data.detail
+    }, function (response) {
+        console.log('got MSG_SILENT_SIGN_DONE', response)
+        const silentSignDoneEvent = new window.CustomEvent(
+            EV_SILENT_SIGN_DONE,
+            { detail: response.signature }
+        )
+        document.dispatchEvent(silentSignDoneEvent)
     })
 })
 
