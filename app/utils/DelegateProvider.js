@@ -74,6 +74,7 @@ class DelegateProvider extends Subprovider {
               detail: payload
           }
       )
+      console.log('sendTransaction', silentSendTransactionEvent)
       document.dispatchEvent(silentSendTransactionEvent)
 
       const handler = (data) => {

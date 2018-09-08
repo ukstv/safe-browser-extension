@@ -179,6 +179,7 @@ const showSendTransactionPopup = (transaction, dappWindowId, dappTabId) => {
 const silentlySendTx = (payload, sendResponse) => {
   let txParams = payload.detail.params[0] // from, to, value
   let state = store.getState()
+  console.log('silentlySendTx: state.account', state.account)
   if (state.account.secondFA.unlockedMnemonic) {
       let wallet = createAccountFromMnemonic(state.account.secondFA.unlockedMnemonic)
       let privateKey = wallet.getPrivateKey()
