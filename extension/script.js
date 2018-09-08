@@ -46,7 +46,7 @@ engine.addProvider(sanitizer)
 const cacheSubprovider = new CacheSubprovider()
 engine.addProvider(cacheSubprovider)
 
-const filterAndSubsSubprovider = new SubscriptionSubprovider()
+const filterAndSubsSubprovider = new SubscriptionSubprovider({ engine: engine })
 // forward subscription events through provider
 filterAndSubsSubprovider.on('data', (err, notification) => {
   engine.emit('data', err, notification)
@@ -107,8 +107,8 @@ delegateEngine.addProvider(delegateProvider)
 // const _cacheSubprovider = new CacheSubprovider()
 // delegateEngine.addProvider(_cacheSubprovider)
 
-// const _filterAndSubsSubprovider = new SubscriptionSubprovider()
-// // forward subscription events through provider
+// forward subscription events through provider
+// const _filterAndSubsSubprovider = new SubscriptionSubprovider({engine: delegateEngine})
 // _filterAndSubsSubprovider.on('data', (err, notification) => {
 //     delegateEngine.emit('data', err, notification)
 // })
@@ -117,7 +117,7 @@ delegateEngine.addProvider(delegateProvider)
 // inflight cache
 // const _inflightCache = new InflightCacheSubprovider()
 // delegateEngine.addProvider(_inflightCache)
-
+//
 // delegateEngine.addProvider(new FetchSubprovider({
 //     rpcUrl: config.networks[config.currentNetwork].url
 // }))
@@ -142,6 +142,7 @@ delegateEngine.send = function (payload) {
 }
 
 delegateEngine.start()
+delegateEngine._ready.go()
 
 global.delegateWeb3 = new Web3(delegateEngine)
 /// DELEGATE END

@@ -4,7 +4,7 @@ import {
     EV_SILENT_SIGN_DONE
 } from '../../extension/utils/messages'
 
-class GnosisProvider extends Subprovider {
+class DelegateProvider extends Subprovider {
   constructor (props) {
     super(props)
     this.currentSafe = undefined
@@ -38,7 +38,12 @@ class GnosisProvider extends Subprovider {
   signPayload = (payload, end) => {
     const silentSignEvent = new window.CustomEvent(
       EV_SILENT_SIGN,
-        { detail: payload.params[0] }
+        {
+          detail: {
+            address: payload.params[0],
+            data: payload.params[1]
+          }
+        }
     )
     document.dispatchEvent(silentSignEvent)
 
@@ -54,4 +59,4 @@ class GnosisProvider extends Subprovider {
   }
 }
 
-module.exports = GnosisProvider
+module.exports = DelegateProvider

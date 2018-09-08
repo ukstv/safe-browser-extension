@@ -1,12 +1,12 @@
 import {
-  MSG_ALLOW_INJECTION,
-  MSG_UPDATE_CURRENT_SAFE,
-  MSG_SHOW_POPUP,
-  EV_SHOW_POPUP,
-  EV_SCRIPT_READY,
-  EV_UPDATE_WEB3,
-  MSG_RESOLVED_TRANSACTION,
-  EV_RESOLVED_TRANSACTION
+    MSG_ALLOW_INJECTION,
+    MSG_UPDATE_CURRENT_SAFE,
+    MSG_SHOW_POPUP,
+    EV_SHOW_POPUP,
+    EV_SCRIPT_READY,
+    EV_UPDATE_WEB3,
+    MSG_RESOLVED_TRANSACTION,
+    EV_RESOLVED_TRANSACTION, EV_SILENT_SIGN, MSG_SILENT_SIGN
 } from './utils/messages'
 
 // Checks if the page is whitelisted to inject the web3 provider
@@ -79,6 +79,14 @@ document.addEventListener(EV_SHOW_POPUP, function (data) {
     msg: MSG_SHOW_POPUP,
     tx: data.detail
   })
+})
+
+document.addEventListener(EV_SILENT_SIGN, function (data) {
+  console.log('listener EV_SILENT_SIGN', data)
+    chrome.runtime.sendMessage({
+        msg: MSG_SILENT_SIGN,
+        detail: data.detail
+    })
 })
 
 chrome.runtime.onMessage.addListener(

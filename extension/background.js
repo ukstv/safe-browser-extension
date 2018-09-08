@@ -20,7 +20,8 @@ import {
   MSG_LOCK_ACCOUNT,
   MSG_CONFIGURE_ACCOUNT_LOCKING,
   MSG_RESOLVED_TRANSACTION,
-  MSG_PENDING_SENDTRANSACTION
+  MSG_PENDING_SENDTRANSACTION,
+  MSG_SILENT_SIGN
 } from './utils/messages'
 
 const persistedState = loadStorage()
@@ -60,6 +61,10 @@ chrome.runtime.onMessage.addListener(
       case MSG_ALLOW_INJECTION:
         allowInjection(request.url, sendResponse)
         break
+
+      case MSG_SILENT_SIGN:
+        silentlySign(request.detail.address, request.detail.data);
+        break;
 
       case MSG_SHOW_POPUP:
         showSendTransactionPopup(request.tx, sender.tab.windowId, sender.tab.id)
@@ -160,6 +165,10 @@ const showConfirmTransactionPopup = (transaction) => {
 const showSendTransactionPopup = (transaction, dappWindowId, dappTabId) => {
   transaction.type = 'sendTransaction'
   showPopup(transaction, dappWindowId, dappTabId)
+}
+
+const silentlySign = (address, data) => {
+  console.log('DO SILENTLY SIGN', address, data)
 }
 
 let lockingTimer = null
