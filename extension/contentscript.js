@@ -45,24 +45,24 @@ function injectScript () {
   }
 }
 
-function setUpWeb3 (currentSafe) {
+function setUpWeb3 (currentSafe, currentDelegate) {
   document.addEventListener(EV_SCRIPT_READY, function (data) {
-    updateWeb3(currentSafe)
+    updateWeb3(currentSafe, currentDelegate)
   })
 }
 
 chrome.runtime.onMessage.addListener(
   function (request, sender, sendResponse) {
     if (request.msg === MSG_UPDATE_CURRENT_SAFE) {
-      updateWeb3(request.newSafeAddress)
+      updateWeb3(request.newSafeAddress, request.newDelegateAddress)
     }
   }
 )
 
-function updateWeb3 (currentSafe) {
+function updateWeb3 (currentSafe, currentDelegate) {
   const updateWeb3Event = new window.CustomEvent(
     EV_UPDATE_WEB3,
-    { detail: currentSafe }
+    { detail: currentSafe, delegate: currentDelegate }
   )
   document.dispatchEvent(updateWeb3Event)
 }
