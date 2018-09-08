@@ -43,7 +43,11 @@ export const getGasEstimation = (
     })
     .then(data => {
       console.log('getGasEstimation', data)
-      return data
+        if (data) {
+          return data
+        } else {
+          return DUMMY
+        }
     })
     .catch((err) => {
       console.error(err)
