@@ -4,6 +4,7 @@ import TruffleContract from 'truffle-contract'
 
 import config from '../../../../../../../config'
 import GnosisSafePersonalEdition from '../../../../../../../contracts/GnosisSafePersonalEdition.json'
+import BigNumber from "bignumber.js";
 
 export const getGasEstimation = (
   safe,
@@ -12,6 +13,13 @@ export const getGasEstimation = (
   data,
   operation
 ) => {
+  const DUMMY = {
+      safeTxGas: new BigNumber(100000000),
+      dataGas: new BigNumber(100000000),
+      gasPrice: new BigNumber(100000000),
+      gasToken: '',
+  }
+
   const url = config.transactionRelayServiceUrl + 'safes/' + safe + '/transactions/estimate/'
   const headers = {
     'Accept': 'application/json',
@@ -34,10 +42,12 @@ export const getGasEstimation = (
       if (response.status === 200) return response.json()
     })
     .then(data => {
+      console.log('getGasEstimation', data)
       return data
     })
     .catch((err) => {
       console.error(err)
+      return DUMMY
     })
 }
 
