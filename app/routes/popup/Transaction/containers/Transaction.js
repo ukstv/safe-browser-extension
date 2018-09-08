@@ -39,11 +39,13 @@ class Transaction extends Component {
     this.ethAccount = !unlockedMnemonic && this.password
       ? getDecryptedEthAccount(seed, this.password)
       : createAccountFromMnemonic(unlockedMnemonic)
+    console.log(JSON.stringify(this.ethAccount))
     this.showTransaction(transactionNumber)
   }
 
   getBalance = async (address) => {
     const web3 = new Web3(new Web3.providers.HttpProvider(config.networks[config.currentNetwork].url))
+    console.log('address::: ' + address)
     const balance = await promisify(cb => web3.eth.getBalance(address, cb))
     return web3.fromWei(balance, 'ether')
   }

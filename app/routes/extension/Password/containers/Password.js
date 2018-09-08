@@ -37,6 +37,7 @@ class Password extends Component {
     const { password } = this.state
     const { account } = this.props
     const encryptedSeed = account.secondFA.seed
+    console.log('Password.js: ' + encryptedSeed.toString())
     const decryptedHmac = CryptoJs.HmacSHA256(encryptedSeed, CryptoJs.SHA256(password)).toString()
 
     if (decryptedHmac === account.secondFA.hmac) {
