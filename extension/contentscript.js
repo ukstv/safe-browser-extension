@@ -18,7 +18,8 @@ chrome.runtime.sendMessage(
   function (response) {
     if (response.answer) {
       injectScript()
-      setUpWeb3(response.currentSafe)
+        console.log('on MSG_ALLOW_INJECTION')
+      setUpWeb3(response.currentSafe, response.currentDelegate)
     } else {
       console.log('This web page is not whitelisted.')
     }
@@ -47,6 +48,7 @@ function injectScript () {
 
 function setUpWeb3 (currentSafe, currentDelegate) {
   document.addEventListener(EV_SCRIPT_READY, function (data) {
+    console.log('on EV_SCRIPT_READY', currentSafe, currentDelegate)
     updateWeb3(currentSafe, currentDelegate)
   })
 }
@@ -62,7 +64,12 @@ chrome.runtime.onMessage.addListener(
 function updateWeb3 (currentSafe, currentDelegate) {
   const updateWeb3Event = new window.CustomEvent(
     EV_UPDATE_WEB3,
-    { detail: currentSafe, delegate: currentDelegate }
+    {
+      detail: {
+        currentSafe: currentSafe,
+          currentDelegate: currentDelegate
+      }
+    }
   )
   document.dispatchEvent(updateWeb3Event)
 }

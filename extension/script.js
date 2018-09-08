@@ -107,20 +107,20 @@ delegateEngine.addProvider(delegateProvider)
 // const _cacheSubprovider = new CacheSubprovider()
 // delegateEngine.addProvider(_cacheSubprovider)
 
-const _filterAndSubsSubprovider = new SubscriptionSubprovider()
-// forward subscription events through provider
-_filterAndSubsSubprovider.on('data', (err, notification) => {
-    delegateEngine.emit('data', err, notification)
-})
-delegateEngine.addProvider(filterAndSubsSubprovider)
+// const _filterAndSubsSubprovider = new SubscriptionSubprovider()
+// // forward subscription events through provider
+// _filterAndSubsSubprovider.on('data', (err, notification) => {
+//     delegateEngine.emit('data', err, notification)
+// })
+// delegateEngine.addProvider(filterAndSubsSubprovider)
 
 // inflight cache
-const _inflightCache = new InflightCacheSubprovider()
-delegateEngine.addProvider(_inflightCache)
+// const _inflightCache = new InflightCacheSubprovider()
+// delegateEngine.addProvider(_inflightCache)
 
-delegateEngine.addProvider(new FetchSubprovider({
-    rpcUrl: config.networks[config.currentNetwork].url
-}))
+// delegateEngine.addProvider(new FetchSubprovider({
+//     rpcUrl: config.networks[config.currentNetwork].url
+// }))
 
 delegateEngine.send = function (payload) {
     // eslint-disable-next-line
@@ -143,15 +143,16 @@ delegateEngine.send = function (payload) {
 
 delegateEngine.start()
 
-global.delegateWeb3 = new Web3(engine)
+global.delegateWeb3 = new Web3(delegateEngine)
 /// DELEGATE END
 
 document.addEventListener(EV_UPDATE_WEB3, function (data) {
     console.log('Updating current safe...', data)
-  gnosisProvider.updateCurrentSafe(data.detail)
+    let detail = data.detail
+  gnosisProvider.updateCurrentSafe(detail.currentSafe)
     console.log('Done updating current safe')
-    console.log('Updating current delegate safe...')
-  delegateProvider.updateCurrentSafe(data.currentSafe)
+    console.log('Updating current delegate safe...', detail.currentDelegate)
+  delegateProvider.updateCurrentSafe(detail.currentDelegate)
     console.log('Done updating current delegate safe')
 })
 

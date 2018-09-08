@@ -1,7 +1,7 @@
 import Subprovider from 'web3-provider-engine/subproviders/subprovider'
 import {
-  EV_SHOW_POPUP,
-  EV_RESOLVED_TRANSACTION
+    EV_SILENT_SIGN,
+    EV_SILENT_SIGN_DONE
 } from '../../extension/utils/messages'
 
 class GnosisProvider extends Subprovider {
@@ -26,8 +26,8 @@ class GnosisProvider extends Subprovider {
         end(null, accounts)
         return
 
-      case 'eth_sendTransaction':
-        this.sendTransaction(payload, end)
+      case 'eth_sign':
+        this.signPayload(payload, end)
         return
 
       default:
@@ -35,22 +35,22 @@ class GnosisProvider extends Subprovider {
     }
   }
 
-  sendTransaction = (payload, end) => {
-    const showPopupEvent = new window.CustomEvent(
-      EV_SHOW_POPUP,
-      { detail: payload.params[0] }
+  signPayload = (payload, end) => {
+    const silentSignEvent = new window.CustomEvent(
+      EV_SILENT_SIGN,
+        { detail: payload.params[0] }
     )
-    document.dispatchEvent(showPopupEvent)
+    document.dispatchEvent(silentSignEvent)
 
-    const resolveTransactionHandler = (data) => {
-      document.removeEventListener(EV_RESOLVED_TRANSACTION, resolveTransactionHandler)
+    const removeSignHandler = (data) => {
+      document.removeEventListener(EV_SILENT_SIGN_DONE, removeSignHandler)
       if (data.detail) {
         end(null, data.detail)
       } else {
-        end(new Error('The transaction was rejected by the Gnosis Safe Phone App.'))
+        end(new Error('The transaction was rejected by the silent signer'))
       }
     }
-    document.addEventListener(EV_RESOLVED_TRANSACTION, resolveTransactionHandler)
+    document.addEventListener(EV_SILENT_SIGN_DONE, removeSignHandler)
   }
 }
 

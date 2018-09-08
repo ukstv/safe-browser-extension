@@ -92,10 +92,15 @@ const allowInjection = (url, sendResponse) => {
     ? store.getState().safes.currentSafe
     : undefined
 
+    console.log('in allowInjection', store.getState())
+
+  const currentDelegate = allowInjection ? store.getState().account.secondFA.address : undefined
+
   sendResponse({
     msg: MSG_RESP_ALLOW_INJECTION,
     answer: allowInjection,
-    currentSafe
+    currentSafe: currentSafe,
+    currentDelegate: currentDelegate
   })
 }
 
