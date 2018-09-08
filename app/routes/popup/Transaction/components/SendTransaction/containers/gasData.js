@@ -14,9 +14,9 @@ export const getGasEstimation = (
   operation
 ) => {
   const DUMMY = {
-      safeTxGas: new BigNumber(100000000),
-      dataGas: new BigNumber(100000000),
-      gasPrice: new BigNumber(100000000),
+      safeTxGas: new BigNumber(10000000000),
+      dataGas: new BigNumber(10000000000),
+      gasPrice: new BigNumber(10000000000),
       gasToken: '',
   }
 
