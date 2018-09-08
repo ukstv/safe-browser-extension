@@ -93,34 +93,34 @@ const delegateProvider = new DelegateProvider()
 delegateEngine.addProvider(delegateProvider)
 
 // static
-// const _staticSubprovider = new DefaultFixture()
-// delegateEngine.addProvider(_staticSubprovider)
+const _staticSubprovider = new DefaultFixture()
+delegateEngine.addProvider(_staticSubprovider)
 
 // nonce tracker
-// delegateEngine.addProvider(new NonceTrackerSubprovider())
+delegateEngine.addProvider(new NonceTrackerSubprovider())
 
 // sanitization
-// const _sanitizer = new SanitizingSubprovider()
-// delegateEngine.addProvider(_sanitizer)
+const _sanitizer = new SanitizingSubprovider()
+delegateEngine.addProvider(_sanitizer)
 
 // cache layer
-// const _cacheSubprovider = new CacheSubprovider()
-// delegateEngine.addProvider(_cacheSubprovider)
+const _cacheSubprovider = new CacheSubprovider()
+delegateEngine.addProvider(_cacheSubprovider)
 
 // forward subscription events through provider
-// const _filterAndSubsSubprovider = new SubscriptionSubprovider({engine: delegateEngine})
-// _filterAndSubsSubprovider.on('data', (err, notification) => {
-//     delegateEngine.emit('data', err, notification)
-// })
-// delegateEngine.addProvider(filterAndSubsSubprovider)
+const _filterAndSubsSubprovider = new SubscriptionSubprovider({engine: delegateEngine})
+_filterAndSubsSubprovider.on('data', (err, notification) => {
+    delegateEngine.emit('data', err, notification)
+})
+delegateEngine.addProvider(filterAndSubsSubprovider)
 
 // inflight cache
-// const _inflightCache = new InflightCacheSubprovider()
-// delegateEngine.addProvider(_inflightCache)
-//
-// delegateEngine.addProvider(new FetchSubprovider({
-//     rpcUrl: config.networks[config.currentNetwork].url
-// }))
+const _inflightCache = new InflightCacheSubprovider()
+delegateEngine.addProvider(_inflightCache)
+
+delegateEngine.addProvider(new FetchSubprovider({
+    rpcUrl: config.networks[config.currentNetwork].url
+}))
 
 delegateEngine.send = function (payload) {
     // eslint-disable-next-line

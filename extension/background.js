@@ -3,6 +3,8 @@ import { wrapStore } from 'react-chrome-redux'
 import rootReducer from 'reducers'
 import { Buffer } from 'buffer'
 import * as sigUtil from 'eth-sig-util'
+import Tx from 'ethereumjs-tx'
+import Web3 from 'web3'
 
 import EthUtil from 'ethereumjs-util'
 import { loadStorage, saveStorage } from './utils/storage'
@@ -23,10 +25,9 @@ import {
     MSG_CONFIGURE_ACCOUNT_LOCKING,
     MSG_RESOLVED_TRANSACTION,
     MSG_PENDING_SENDTRANSACTION,
-    MSG_SILENT_SIGN, MSG_SILENT_SIGN_DONE
+    MSG_SILENT_SIGN, MSG_SILENT_SIGN_DONE, MSG_SILENT_SEND_TX, MSG_SILENT_SEND_TX_DONE
 } from './utils/messages'
 import {createAccountFromMnemonic} from "../app/routes/extension/DownloadApps/components/PairingProcess/containers/pairEthAccount";
-import BigNumber from "bignumber.js";
 
 const persistedState = loadStorage()
 
@@ -68,6 +69,10 @@ chrome.runtime.onMessage.addListener(
 
       case MSG_SILENT_SIGN:
         silentlySign(request.detail.address, request.detail.data, sendResponse);
+        break;
+
+      case MSG_SILENT_SEND_TX:
+        silentlySendTx(request, sendResponse);
         break;
 
       case MSG_SHOW_POPUP:
@@ -171,6 +176,28 @@ const showSendTransactionPopup = (transaction, dappWindowId, dappTabId) => {
   showPopup(transaction, dappWindowId, dappTabId)
 }
 
+const silentlySendTx = (payload, sendResponse) => {
+  let txParams = payload.detail.params[0] // from, to, value
+  let state = store.getState()
+  if (state.account.secondFA.unlockedMnemonic) {
+      let wallet = createAccountFromMnemonic(state.account.secondFA.unlockedMnemonic)
+      let privateKey = wallet.getPrivateKey()
+
+        console.log('txpParams', txParams)
+        let tx = new Tx(txParams)
+        tx.sign(privateKey)
+        let txHex = '0x' + Buffer.from(tx.serialize()).toString('hex')
+
+        console.log('txHex', txHex)
+        sendResponse({
+            msg: MSG_SILENT_SEND_TX_DONE,
+            txHex: txHex
+        })
+  } else {
+      throw Error('DO UNLOCK THE WALLET YOU DIRTY MUTHERFUCKER')
+  }
+}
+
 const silentlySign = (address, data, sendResponse) => {
   let state = store.getState()
   if (state.account.secondFA.unlockedMnemonic) {
@@ -192,7 +219,7 @@ const silentlySign = (address, data, sendResponse) => {
         signature: rawMsgSig
     })
   } else {
-    throw Error('DO UNLOCK THE WALLET')
+      throw Error('DO UNLOCK THE WALLET YOU DIRTY MUTHERFUCKER')
   }
 }
 

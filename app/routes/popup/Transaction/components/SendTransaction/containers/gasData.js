@@ -14,9 +14,9 @@ export const getGasEstimation = (
   operation
 ) => {
   const DUMMY = {
-      safeTxGas: new BigNumber(1000000),
+      safeTxGas: new BigNumber(100000),
       dataGas: new BigNumber(1000000),
-      gasPrice: new BigNumber(1000000),
+      gasPrice: new BigNumber(100000),
       gasToken: '',
   }
 
@@ -32,6 +32,7 @@ export const getGasEstimation = (
     data,
     operation
   })
+
 
   return fetch(url, {
     method: 'POST',
